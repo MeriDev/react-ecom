@@ -12,25 +12,17 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+
+export const auth = getAuth(app);
+
 const provider = new GoogleAuthProvider();
 
-export const auth = getAuth();
-signInWithPopup(auth, provider)
-  .then(result => {
-    // This gives you a Google Access Token. You can use it to access the Google API.
-    var credential = GoogleAuthProvider.credentialFromResult(result);
-    var token = credential.accessToken;
-    // The signed-in user info.
-    var user = result.user;
-    // ...
-  })
-  .catch(error => {
-    // Handle Errors here.
-    var errorCode = error.code;
-    var errorMessage = error.message;
-    // The email of the user's account used.
-    var email = error.email;
-    // The AuthCredential type that was used.
-    var credential = GoogleAuthProvider.credentialFromError(error);
-    // ...
-  });
+export const signUpWithGoogle = () => {
+  signInWithPopup(auth, provider)
+    .then(result => {
+      console.log(result);
+    })
+    .catch(error => {
+      console.log(error);
+    });
+};
