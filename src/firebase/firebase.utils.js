@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-
+import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 
 const firebaseConfig = {
@@ -26,3 +26,12 @@ export const signUpWithGoogle = () => {
       console.log(error);
     });
 };
+
+// FIRESTORE
+const db = getFirestore();
+
+const users = collection(db, 'users');
+
+getDocs(users).then(snapshot => {
+  console.log(snapshot.docs());
+});
