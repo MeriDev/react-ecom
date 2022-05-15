@@ -1,5 +1,11 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, getDocs } from 'firebase/firestore';
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  addDoc,
+  Firestore,
+} from 'firebase/firestore';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 
 const firebaseConfig = {
@@ -13,8 +19,46 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-export const auth = getAuth(app);
+// Add users to DB
 
+// FIRESTORE
+const db = getFirestore();
+const users = collection(db, 'users');
+
+getDocs(users).then(snapshot => {
+  console.log(snapshot.docs());
+});
+
+export const createUserProfileDoc = async (userAuth, additionalData) => {
+  if (!userAuth) return;
+
+  // const userRef = Firestore.doc(`users/${userAuth.uid}`);
+  const userRef = getDocs(`users/${userAuth.uid}`);
+  // const snapShot = await userRef.get();
+
+  console.log(userRef);
+
+  // if (!snapShot.exists) {
+  // }
+  const { displayName, email } = userAuth;
+  const createdAt = new Date();
+
+  // await userRef.set({
+  //   displayName,
+  //   email,
+  //   createdAt,
+  //   ...additionalData,
+  // });
+  addDoc(users, {
+    displayName,
+    email,
+    createdAt,
+    ...additionalData,
+  }).then(user => console.log(user));
+};
+
+// Sign in with google
+export const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
 export const signUpWithGoogle = () => {
@@ -26,12 +70,3 @@ export const signUpWithGoogle = () => {
       console.log(error);
     });
 };
-
-// FIRESTORE
-const db = getFirestore();
-
-const users = collection(db, 'users');
-
-getDocs(users).then(snapshot => {
-  console.log(snapshot.docs());
-});
