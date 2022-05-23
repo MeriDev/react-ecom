@@ -1,5 +1,11 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, getDocs, addDoc } from 'firebase/firestore';
+import {
+  getFirestore,
+  collection,
+  doc,
+  getDoc,
+  addDoc,
+} from 'firebase/firestore';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 
 const firebaseConfig = {
@@ -13,36 +19,35 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-// Add users to DB
-
+//* Add users to DB
 // FIRESTORE
 const db = getFirestore(app);
-
-const users = collection(db, 'users');
 
 export const createUserProfileDoc = async (userAuth, additionalData) => {
   if (!userAuth) return;
 
-  const querySnapshot = await getDocs(users);
-  const userRef = getDocs(`users/${userAuth.uid}`);
+  const users = collection(db, 'users');
 
-  querySnapshot.forEach(doc => {
-    if (doc.id !== userRef) {
-      const { displayName, email } = userAuth;
-      const createdAt = new Date();
+  const userRef = doc(db, 'users', userAuth.uid);
+  const docSnap = await getDoc(userRef);
 
-      try {
-        addDoc(collection(db, 'users'), {
-          displayName,
-          email,
-          createdAt,
-          ...additionalData,
-        });
-      } catch (e) {
-        console.error('Error adding document: ', e);
-      }
+  if (docSnap.exists()) {
+    const { displayName, email } = userAuth;
+    const createdAt = new Date();
+
+    try {
+      addDoc(users, {
+        displayName,
+        email,
+        createdAt,
+        ...additionalData,
+      });
+    } catch (e) {
+      console.error('Error adding document: ', e);
     }
-  });
+  }
+
+  return userRef;
 };
 
 // Sign in with google
