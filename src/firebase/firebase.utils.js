@@ -1,11 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import {
-  getFirestore,
-  collection,
-  doc,
-  getDoc,
-  addDoc,
-} from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 
 const firebaseConfig = {
@@ -26,17 +20,17 @@ const db = getFirestore(app);
 export const createUserProfileDoc = async (userAuth, additionalData) => {
   if (!userAuth) return;
 
-  const users = collection(db, 'users');
+  // const users = collection(db, 'users');
 
   const userRef = doc(db, 'users', userAuth.uid);
   const docSnap = await getDoc(userRef);
 
-  if (docSnap.exists()) {
+  if (!docSnap.exists()) {
     const { displayName, email } = userAuth;
     const createdAt = new Date();
 
     try {
-      addDoc(users, {
+      setDoc(userRef, {
         displayName,
         email,
         createdAt,
@@ -46,7 +40,6 @@ export const createUserProfileDoc = async (userAuth, additionalData) => {
       console.error('Error adding document: ', e);
     }
   }
-
   return userRef;
 };
 
