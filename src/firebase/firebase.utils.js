@@ -16,11 +16,10 @@ const app = initializeApp(firebaseConfig);
 //* Add users to DB
 // FIRESTORE
 const db = getFirestore(app);
+// const users = collection(db, 'users');
 
 export const createUserProfileDoc = async (userAuth, additionalData) => {
   if (!userAuth) return;
-
-  // const users = collection(db, 'users');
 
   const userRef = doc(db, 'users', userAuth.uid);
   const docSnap = await getDoc(userRef);
@@ -30,20 +29,20 @@ export const createUserProfileDoc = async (userAuth, additionalData) => {
     const createdAt = new Date();
 
     try {
-      setDoc(userRef, {
+      await setDoc(userRef, {
         displayName,
         email,
         createdAt,
         ...additionalData,
       });
-    } catch (e) {
-      console.error('Error adding document: ', e);
+    } catch (err) {
+      console.error('Error adding document: ', err.mesage);
     }
   }
   return userRef;
 };
 
-// Sign in with google
+//* Sign in with google
 export const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
